@@ -3,6 +3,6 @@ module com.example.tkachukkursovaya {
     requires javafx.fxml;
 
 
-    opens com.example.tkachukkursovaya to javafx.fxml;
-    exports com.example.tkachukkursovaya;
+    exports Server.mvc;
+    opens Server.mvc to javafx.fxml;
 }
