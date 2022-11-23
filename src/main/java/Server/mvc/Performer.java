@@ -1,20 +1,23 @@
 package Server.mvc;
 
 
+import Server.mvc.Interfaces.Connection;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Model {
-
-    public String connection;
-
-    public String getConnection() {
-        return connection;
-    }
-
+public class Performer implements Connection {
     public boolean serverStatus = true;
+
+    public List<String> clientsStatus = new ArrayList<>();
+
+    public List<String> getClientsStatus() {
+        return clientsStatus;
+    }
 
     public boolean isServerStatus() {
         return serverStatus;
@@ -24,9 +27,18 @@ public class Model {
         this.serverStatus = serverStatus;
     }
 
-    public Model() {
+    public Performer()
+    {}
 
+    @Override
+    public void handleEvent(String connections, int flag) {
+        if (flag == 1){
+            this.clientsStatus.add(connections);
+        } else {
+            this.clientsStatus.remove(connections);
+        }
     }
+
 
     public class ServerStatusThread implements Runnable {
         Thread thread;
@@ -73,25 +85,13 @@ public class Model {
             Socket client = null;
             ServerStatusThread serverStatusThread = new ServerStatusThread(server);
             while (isServerStatus()) {
-
                 try {
                     client = server.accept();
                 } catch (IOException e) {
                     break;
                 }
-
-                this.connection = ("Подключен новый клиент "
-                        + client.getInetAddress().getHostAddress());
-
                 ClientHandler clientSock = new ClientHandler(client);
-                try {
-                    clientSock.thread.join();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                if (clientSock.isTurnOffServer()) {
-                    break;
-                }
+                clientSock.addConnection(this);
             }
         } finally {
             if (server != null) {
@@ -106,23 +106,3 @@ public class Model {
     }
 }
 
-class ClientHandler implements Runnable {
-    Thread thread;
-    private final Socket clientSocket;
-    private boolean turnOffServer = false;
-
-    public ClientHandler(Socket socket) {
-        this.thread = new Thread(this, "Client thread");
-        this.thread.start();
-        this.clientSocket = socket;
-    }
-
-    public boolean isTurnOffServer() {
-        return this.turnOffServer;
-    }
-
-    @Override
-    public void run() {
-
-    }
-}

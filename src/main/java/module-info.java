@@ -5,4 +5,6 @@ module com.example.tkachukkursovaya {
 
     exports Server.mvc;
     opens Server.mvc to javafx.fxml;
+    exports Server.mvc.Interfaces;
+    opens Server.mvc.Interfaces to javafx.fxml;
 }
