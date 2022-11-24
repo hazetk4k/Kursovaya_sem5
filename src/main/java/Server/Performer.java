@@ -1,7 +1,7 @@
-package Server.mvc;
+package Server;
 
 
-import Server.mvc.Interfaces.Connection;
+import Server.Interfaces.Connection;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,6 +12,12 @@ import java.util.List;
 
 public class Performer implements Connection {
     public boolean serverStatus = true;
+
+    public String serverPort = "3311";
+
+    public void setServerPort(String serverPort) {
+        this.serverPort = serverPort;
+    }
 
     public List<String> clientsStatus = new ArrayList<>();
 
@@ -73,7 +79,7 @@ public class Performer implements Connection {
         ServerSocket server = null;
         try {
             try {
-                server = new ServerSocket(3311);
+                server = new ServerSocket(Integer.parseInt(serverPort));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

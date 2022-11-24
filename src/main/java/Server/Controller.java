@@ -1,4 +1,4 @@
-package Server.mvc;
+package Server;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,10 +22,11 @@ public class Controller {
     @FXML
     private TextField btnIP;
 
+
     public void onBtnRefresh(ActionEvent actionEvent) {
         List<String> listOfConnections = performer.getClientsStatus();
         this.ConnectionInfo.getItems().clear();
-        for(int i = 0; i <= listOfConnections.size() - 1; i++){
+        for (int i = 0; i <= listOfConnections.size() - 1; i++) {
             this.ConnectionInfo.getItems().add(listOfConnections.get(i));
         }
     }
@@ -57,13 +58,35 @@ public class Controller {
 
 
     public void OnButtonStart(ActionEvent actionEvent) {
-        performer.serverStatus = true;
-        this.ConnectionInfo.getItems().clear();
-        this.ConnectionInfo.getItems().add("Сервер запущен!");
-        this.btnRefresh.setDisable(false);
-        this.startServer.setDisable(true);
-        this.stopServer.setDisable(false);
-        this.btnPort.setDisable(true);
-        StartThread startThread = new StartThread();
+
+        if (portValid() == 1) {
+            this.btnPort.setText("");
+            this.btnPort.setPromptText("Длина порта должна быть 4!");
+        } else if (portValid() == 2) {
+            this.btnPort.setText("");
+            this.btnPort.setPromptText("Порт должен содержать только цифры!");
+        } else {
+            performer.setServerPort(this.btnPort.getText());
+            performer.serverStatus = true;
+            this.ConnectionInfo.getItems().clear();
+            this.ConnectionInfo.getItems().add("Сервер запущен!");
+            this.btnRefresh.setDisable(false);
+            this.btnPort.setDisable(true);
+            this.startServer.setDisable(true);
+            this.stopServer.setDisable(false);
+            this.btnPort.setDisable(true);
+            StartThread startThread = new StartThread();
+        }
+    }
+
+    public int portValid() {
+        String port;
+        String regex = "\\d+";
+        port = this.btnPort.getText();
+        if (port.length() != 4) {
+            return 1;
+        } else if (!port.matches(regex)) {
+            return 2;
+        }else return 3;
     }
 }

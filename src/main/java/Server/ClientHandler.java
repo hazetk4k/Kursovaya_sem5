@@ -1,7 +1,7 @@
-package Server.mvc;
+package Server;
 
-import Server.mvc.Interfaces.Connected;
-import Server.mvc.Interfaces.Connection;
+import Server.Interfaces.Connected;
+import Server.Interfaces.Connection;
 
 import java.io.BufferedReader;
 import java.io.IOException;

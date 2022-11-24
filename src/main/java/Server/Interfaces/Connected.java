@@ -1,4 +1,4 @@
-package Server.mvc.Interfaces;
+package Server.Interfaces;
 
 public interface Connected {
     public void addConnection(Connection connection);
