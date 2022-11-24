@@ -11,7 +11,7 @@
       <TextField fx:id="btnIP" disable="true" editable="false" layoutX="300.0" layoutY="53.0" prefHeight="26.0" prefWidth="122.0" promptText="127.0.0.1" text="127.0.0.1" />
       <TextField fx:id="btnPort" layoutX="300.0" layoutY="14.0" prefHeight="26.0" prefWidth="122.0" promptText="3311" text="3311" />
       <Button fx:id="startServer" layoutX="299.0" layoutY="268.0" mnemonicParsing="false" onAction="#OnButtonStart" prefHeight="26.0" prefWidth="122.0" text="Начать работу" />
-      <Button fx:id="btnRefresh" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onBtnRefresh" prefHeight="26.0" prefWidth="278.0" text="Обновить область сообщений" />
+      <Button fx:id="btnRefresh" disable="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onBtnRefresh" prefHeight="26.0" prefWidth="278.0" text="Обновить область сообщений" />
       <ListView fx:id="ConnectionInfo" layoutX="14.0" layoutY="53.0" prefHeight="284.0" prefWidth="278.0" />
    </children>
 </AnchorPane>

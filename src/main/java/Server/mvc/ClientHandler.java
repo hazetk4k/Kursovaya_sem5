@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 class ClientHandler implements Runnable, Connected {
-    private List<Connection> connections;
+    private final List<Connection> connections;
 
 
     Thread thread;

@@ -48,6 +48,7 @@ public class Controller {
     public void OnButtonStop(ActionEvent actionEvent) {
         this.ConnectionInfo.getItems().clear();
         this.ConnectionInfo.getItems().add("Сервер выключен!");
+        this.btnRefresh.setDisable(true);
         this.startServer.setDisable(false);
         this.stopServer.setDisable(true);
         this.btnPort.setDisable(false);
@@ -59,6 +60,7 @@ public class Controller {
         performer.serverStatus = true;
         this.ConnectionInfo.getItems().clear();
         this.ConnectionInfo.getItems().add("Сервер запущен!");
+        this.btnRefresh.setDisable(false);
         this.startServer.setDisable(true);
         this.stopServer.setDisable(false);
         this.btnPort.setDisable(true);
