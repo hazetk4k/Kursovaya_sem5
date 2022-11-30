@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,10 +39,13 @@ class ClientHandler implements Runnable, Connected {
             try {
                 out = new PrintWriter(this.clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+                MakeSql makeSql = new MakeSql();
                 String line = in.readLine();
+                String result = "";
                 switch (line) {
                     case "Disconnect":
                         try {
+                            System.out.println("Отключение пользователя!");
                             in.close();
                             notifyConnections("Подключен клиент: ip: " + clientSocket.getInetAddress().getHostAddress() + ", порт: " + clientSocket.getPort(), 0);
                             this.clientSocket.close();
@@ -49,8 +54,49 @@ class ClientHandler implements Runnable, Connected {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                    case "Модели":
+                        result += makeSql.modelGetName("table_fuel");
+                        result += "///";
+                        result += makeSql.modelGetName("table_battery");
+                        result += "///";
+                        result += makeSql.modelGetName("table_carcase");
+                        result += "///";
+                        result += makeSql.modelGetName("table_wheels");
+                        result += "///";
+                        out.println(result);
+                        System.out.println("Данные по моделям!");
+                        break;
+                    case "Продукты":
+                        result = makeSql.getAllProducts();
+                        if (result.equals("")) {
+                            out.println("Нет данных");
+                        } else {
+                            out.println(result);
+                        }
+                        System.out.println("Данные по продуктам!");
+                        break;
+                    default:
+                        String[] args = line.split("; ");
+                        switch (args[0]) {
+                            case "Авторизация" -> {
+                                System.out.println("Авторизация пользователя!");
+                                result = makeSql.Authorization(args[1], args[2]);
+                            }
+                            case "Регистрация" -> {
+                                System.out.println("Регистрация нового пользователя");
+                                makeSql.insertNewClient(args[1], args[2], args[3]);
+                                result = "added";
+                            }
+                            case "Добавление" -> {
+                                System.out.println("Добавление нового продукта");
+                                makeSql.insertNewProduct(args[1], args[2], args[3], args[4], args[5]);
+                                result = "added";
+                            }
+                        }
+                        out.println(result);
+
                 }
-            } catch (IOException e) {
+            } catch (IOException | SQLException e) {
                 throw new RuntimeException(e);
             }
         }

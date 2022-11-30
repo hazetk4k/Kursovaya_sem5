@@ -22,7 +22,7 @@ public class Controller {
     @FXML
     private TextField btnIP;
 
-
+    @FXML
     public void onBtnRefresh(ActionEvent actionEvent) {
         List<String> listOfConnections = performer.getClientsStatus();
         this.ConnectionInfo.getItems().clear();
@@ -30,7 +30,6 @@ public class Controller {
             this.ConnectionInfo.getItems().add(listOfConnections.get(i));
         }
     }
-
     class StartThread implements Runnable {
 
         Thread tread;
@@ -45,7 +44,7 @@ public class Controller {
             performer.ModelMain();
         }
     }
-
+    @FXML
     public void OnButtonStop(ActionEvent actionEvent) {
         this.ConnectionInfo.getItems().clear();
         this.ConnectionInfo.getItems().add("Сервер выключен!");
@@ -56,7 +55,7 @@ public class Controller {
         performer.serverStatus = false;
     }
 
-
+    @FXML
     public void OnButtonStart(ActionEvent actionEvent) {
 
         if (portValid() == 1) {
