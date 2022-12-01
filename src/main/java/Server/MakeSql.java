@@ -10,6 +10,7 @@ public class MakeSql {
     public static final String PASSWORD = "1234";
     public static final String URL = "jdbc:mysql://localhost:3306/mysql";
     public static final String SELECT_QUERY = "SELECT * FROM client_auth WHERE login=";
+    public static final String DELETE_PRODUCT_QUERY = "DELETE FROM products WHERE id = ?";
     public static final String SELECT_MODEL_QUERY = "SELECT * FROM ";
     public static final String SELECT_ALL_PRODUCTS = "SELECT * FROM products";
     public static final String INSERT_PRODUCT_QUERRY = "INSERT INTO products (model_name, fuel, battery, carcase, wheels) VALUES (?, ?, ?, ?, ?)";
@@ -38,6 +39,20 @@ public class MakeSql {
     public void disconnect() throws SQLException {
         statement.close();
         connection.close();
+    }
+
+    public void deleteProduct(int id) throws SQLException{
+        try(PreparedStatement preparedStatement = connection.prepareStatement(DELETE_PRODUCT_QUERY)) {
+            preparedStatement.setInt(1, id);
+
+            System.out.println(preparedStatement);
+            preparedStatement.executeUpdate();
+            try {
+                preparedStatement.close();
+            } catch (SQLException ignored) {}
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
     }
 
     public String getAllProducts() throws SQLException {

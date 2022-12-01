@@ -79,18 +79,29 @@ class ClientHandler implements Runnable, Connected {
                         String[] args = line.split("; ");
                         switch (args[0]) {
                             case "Авторизация" -> {
-                                System.out.println("Авторизация пользователя!");
                                 result = makeSql.Authorization(args[1], args[2]);
+                                System.out.println("Авторизация пользователя!");
                             }
                             case "Регистрация" -> {
-                                System.out.println("Регистрация нового пользователя");
                                 makeSql.insertNewClient(args[1], args[2], args[3]);
                                 result = "added";
+                                System.out.println("Регистрация нового пользователя");
                             }
                             case "Добавление" -> {
-                                System.out.println("Добавление нового продукта");
                                 makeSql.insertNewProduct(args[1], args[2], args[3], args[4], args[5]);
                                 result = "added";
+                                System.out.println("Добавление нового продукта");
+                            }
+                            case "Удаление" -> {
+                                makeSql.deleteProduct(Integer.parseInt(args[1]));
+                                System.out.println("Удаление выбранного продукта");
+                                result = makeSql.getAllProducts();
+                                if (result.equals("")) {
+                                    out.println("Нет данных");
+                                } else {
+                                    out.println(result);
+                                }
+                                System.out.println("Данные по продуктам!");
                             }
                         }
                         out.println(result);
