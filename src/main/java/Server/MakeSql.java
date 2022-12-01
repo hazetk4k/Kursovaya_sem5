@@ -15,6 +15,7 @@ public class MakeSql {
     public static final String SELECT_ALL_PRODUCTS = "SELECT * FROM products";
     public static final String INSERT_PRODUCT_QUERRY = "INSERT INTO products (model_name, fuel, battery, carcase, wheels) VALUES (?, ?, ?, ?, ?)";
     public static final String INSERT_QUERY = "INSERT INTO client_auth (login, password, ac_level) VALUES (?, ?, ?)";
+    public static final String UPDATE_QUERY = "UPDATE products SET model_name = ?, fuel = ?, battery = ?, carcase = ?, wheels = ? WHERE id = ?";
     public static Statement statement;
     public static Connection connection;
 
@@ -41,6 +42,24 @@ public class MakeSql {
         connection.close();
     }
 
+    public void editProduct(String model_name, String fuel, String battery, String carcase, String wheels, String id){
+        try(PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_QUERY)) {
+            preparedStatement.setString(1, model_name);
+            preparedStatement.setString(2, fuel);
+            preparedStatement.setString(3, battery);
+            preparedStatement.setString(4, carcase);
+            preparedStatement.setString(5, wheels);
+            preparedStatement.setInt(6, Integer.parseInt(id));
+
+            System.out.println(preparedStatement);
+            preparedStatement.executeUpdate();
+            try {
+                preparedStatement.close();
+            } catch (SQLException ignored) {}
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+    }
     public void deleteProduct(int id) throws SQLException{
         try(PreparedStatement preparedStatement = connection.prepareStatement(DELETE_PRODUCT_QUERY)) {
             preparedStatement.setInt(1, id);

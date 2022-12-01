@@ -78,6 +78,11 @@ class ClientHandler implements Runnable, Connected {
                     default:
                         String[] args = line.split("; ");
                         switch (args[0]) {
+                            case "Изменение" -> {
+                                makeSql.editProduct(args[1], args[2], args[3], args[4], args[5], args[6]);
+                                result = "updated";
+                                System.out.println("Изменения данных продукта");
+                            }
                             case "Авторизация" -> {
                                 result = makeSql.Authorization(args[1], args[2]);
                                 System.out.println("Авторизация пользователя!");
