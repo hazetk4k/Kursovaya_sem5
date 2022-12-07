@@ -42,8 +42,8 @@ public class MakeSql {
         connection.close();
     }
 
-    public void editProduct(String model_name, String fuel, String battery, String carcase, String wheels, String id){
-        try(PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_QUERY)) {
+    public void editProduct(String model_name, String fuel, String battery, String carcase, String wheels, String id) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_QUERY)) {
             preparedStatement.setString(1, model_name);
             preparedStatement.setString(2, fuel);
             preparedStatement.setString(3, battery);
@@ -55,20 +55,23 @@ public class MakeSql {
             preparedStatement.executeUpdate();
             try {
                 preparedStatement.close();
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         } catch (SQLException e) {
             printSQLException(e);
         }
     }
-    public void deleteProduct(int id) throws SQLException{
-        try(PreparedStatement preparedStatement = connection.prepareStatement(DELETE_PRODUCT_QUERY)) {
+
+    public void deleteProduct(int id) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(DELETE_PRODUCT_QUERY)) {
             preparedStatement.setInt(1, id);
 
             System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
             try {
                 preparedStatement.close();
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         } catch (SQLException e) {
             printSQLException(e);
         }
@@ -149,6 +152,38 @@ public class MakeSql {
         } catch (SQLException e) {
             printSQLException(e);
         }
+    }
+
+    public String getProductFields(String table, String condition, String param, int flag) throws SQLException {
+        ResultSet resultSet = null;
+        int newParam = 0;
+        if (flag == 1) {
+            newParam = Integer.parseInt(param);
+            resultSet = statement.executeQuery(SELECT_MODEL_QUERY + table + condition + newParam);
+        } else {
+            resultSet = statement.executeQuery(SELECT_MODEL_QUERY + table + condition + param);
+        }
+        String result = "";
+        if (table == "products"){
+            while (resultSet.next()) {
+                for (int i = 1; i <= 6; i++) {
+                    result += resultSet.getString(i);
+                    result += "; ";
+                }
+            }
+        } else {
+            while (resultSet.next()) {
+                for (int i = 1; i <= 5; i++) {
+                    result += resultSet.getString(i);
+                    result += "; ";
+                }
+            }
+        }
+        if (result.equals("")) {
+            result = "";
+        }
+        resultSet.close();
+        return result;
     }
 
     public void insertNewClient(String login, String password, String ac_level) {
