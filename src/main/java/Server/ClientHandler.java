@@ -18,7 +18,6 @@ import java.util.Objects;
 class ClientHandler implements Runnable, Connected {
     private final List<Connection> connections;
 
-
     Thread thread;
 
     private final Socket clientSocket;
@@ -39,7 +38,7 @@ class ClientHandler implements Runnable, Connected {
             for (int i = 1; i < 4; i++) {
                 float count = Float.parseFloat(thisProductField[i]) / Float.parseFloat(thisBaseField[i]);
                 String res = new DecimalFormat("#0.00").format(count);
-                result += String.valueOf(res);
+                result += String.valueOf(res.replace(",", "."));
                 result += "; ";
             }
             result += "///";
@@ -87,13 +86,13 @@ class ClientHandler implements Runnable, Connected {
         for (int i = 0; i < 3; i++) {
             if (!Objects.equals(eachQuality[i], "1,00")) {
                 isFullEqual = false;
-            }
-            if (Float.parseFloat(eachQuality[i]) < 1) {
+            } //
+            if (Double.parseDouble(eachQuality[i]) < 1) {
                 neg.add(i);
                 isFullPositive = false;
                 isThereNeg = true;
             }
-            if (Float.parseFloat(eachQuality[i]) > 1) {
+            if (Double.parseDouble(eachQuality[i]) > 1) {
                 isFullNegative = false;
             }
         }
@@ -109,13 +108,51 @@ class ClientHandler implements Runnable, Connected {
             if (isThereNeg) {
                 result = "Уровень качества ниже базового у следующих показателей: ";
                 for (int args : neg) {
-                    result += args + "| ";
+                    result += args + ": ";
                 }
             } else {
                 return "Уровень качества каждого показателя выше бозового или равен ему";
             }
         }
         return result;
+    }
+
+    public String getPriceDiff(String[] products, String[] bases) {
+        String result = "";
+        for (int j = 0; j < 4; j++) {
+            String thisBasePrice = bases[j].split("; ")[4];
+            String thisProductPrice = products[j + 1].split("; ")[4];
+            int res = Integer.parseInt(thisBasePrice) - Integer.parseInt(thisProductPrice);
+            if (res < 0) {
+                result += "Цена детали больше базовой; ";
+            }
+            if (res > 0) {
+                result += "Цена детали меньше базовой; ";
+            }
+            if (res == Integer.parseInt(thisBasePrice)) {
+                result += "Цена детали равна базовой; ";
+            }
+            result += thisBasePrice + "; " + thisProductPrice + "; ";
+            result += "///";
+        }
+        return result;
+    }
+
+    public int whatTable(String tableName) {
+        int table = 0;
+        if (Objects.equals(tableName, "table_fuel")) {
+            table = 1;
+        }
+        if (Objects.equals(tableName, "table_battery")) {
+            table = 2;
+        }
+        if (Objects.equals(tableName, "table_carcase")) {
+            table = 3;
+        }
+        if (Objects.equals(tableName, "table_wheels")) {
+            table = 4;
+        }
+        return table;
     }
 
     @Override
@@ -143,6 +180,7 @@ class ClientHandler implements Runnable, Connected {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        break;
                     case "Модели":
                         result += makeSql.modelGetName("table_fuel");
                         result += "///";
@@ -188,7 +226,7 @@ class ClientHandler implements Runnable, Connected {
                             }
                             case "Удаление" -> {
                                 makeSql.deleteProduct(Integer.parseInt(args[1]));
-                                System.out.println("Удаление выбранного продукта");
+                                System.out.println("Удаление выбранного продукта!");
                                 result = makeSql.getAllProducts();
                                 if (result.equals("")) {
                                     out.println("Нет данных");
@@ -196,6 +234,44 @@ class ClientHandler implements Runnable, Connected {
                                     out.println(result);
                                 }
                                 System.out.println("Данные по продуктам!");
+                            }
+                            case "Удалить деталь" -> {
+                                String res = makeSql.deleteDetail(args[1], args[2]);
+                                if (Objects.equals(res, "good")) {
+                                    System.out.println("Удаление выбранной детали!");
+                                    out.println("Верно");
+                                } else {
+                                    System.out.println("Удаление не выполнено. Эта деталь используется продуктом!");
+                                    out.println("Ошибка");
+                                }
+                                result = makeSql.modelGetAll(args[2]);
+                                if (result.equals("")) {
+                                    result = "Нет данных";
+                                }
+                                System.out.println("Получение деталей!");
+                            }
+                            case "Деталь" -> {
+                                result = makeSql.modelGetAll(args[1]);
+                                if (result.equals("")) {
+                                    result = "Нет данных";
+                                }
+                                System.out.println("Получение детали!");
+                            }
+                            case "Новая деталь" -> {
+                                int table = whatTable(args[1]);
+                                makeSql.insertDetail(args[2], Float.parseFloat(args[3]), Float.parseFloat(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), table);
+                                result = "added";
+                                System.out.println("Добавление детали!");
+                            }
+                            case "Изменить деталь" -> {
+                                int table = whatTable(args[1]);
+                                String res = makeSql.editDetail(args[2], Float.parseFloat(args[3]), Float.parseFloat(args[4]), Integer.parseInt(args[5]), Integer.parseInt(args[6]), table, args[7]);
+                                if (Objects.equals(res, "good")) {
+                                    result = "changed";
+                                } else {
+                                    result = "unchanged";
+                                }
+                                System.out.println("Добавление детали!");
                             }
                             case "Отчет" -> {
                                 String baseValues = "";
@@ -217,7 +293,9 @@ class ClientHandler implements Runnable, Connected {
                                     result += DiffMethod(productQuality[i]);
                                     result += "///";
                                 }
-                                System.out.println(result);
+                                // результаты разницы в стоимости
+                                result += getPriceDiff(productFields, baseFields);
+                                System.out.println("Отчет!");
                             }
                         }
                         out.println(result);

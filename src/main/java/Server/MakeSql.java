@@ -1,8 +1,6 @@
 package Server;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class MakeSql {
@@ -15,7 +13,19 @@ public class MakeSql {
     public static final String SELECT_ALL_PRODUCTS = "SELECT * FROM products";
     public static final String INSERT_PRODUCT_QUERRY = "INSERT INTO products (model_name, fuel, battery, carcase, wheels) VALUES (?, ?, ?, ?, ?)";
     public static final String INSERT_QUERY = "INSERT INTO client_auth (login, password, ac_level) VALUES (?, ?, ?)";
+    public static final String INSERT_FUEL = "INSERT INTO table_fuel (model_name, volume, pressure, mileage, price) VALUES (?, ?, ?, ?, ?)";
+    public static final String INSERT_BATTERY = "INSERT INTO table_battery (model_name, capacity, voltage, mileage, price) VALUES (?, ?, ?, ?, ?)";
+    public static final String INSERT_CARCASE = "INSERT INTO table_carcase (model_name, metal_thickness, glass_thickness, mileage, price) VALUES (?, ?, ?, ?, ?)";
+    public static final String INSERT_WHEELS = "INSERT INTO table_wheels (model_name, pressure, width, mileage, price) VALUES (?, ?, ?, ?, ?)";
     public static final String UPDATE_QUERY = "UPDATE products SET model_name = ?, fuel = ?, battery = ?, carcase = ?, wheels = ? WHERE id = ?";
+
+    public static final String UPDATE_FUEL = "UPDATE table_fuel SET model_name = ?, volume = ?, pressure = ?, mileage = ?, price = ? WHERE model_name = ?";
+    public static final String UPDATE_BATTERY = "UPDATE table_battery SET model_name = ?, capacity = ?, voltage = ?, mileage = ?, price = ? WHERE model_name = ?";
+    ;
+    public static final String UPDATE_CARCASE = "UPDATE table_carcase SET model_name = ?, metal_thickness = ?, glass_thickness = ?, mileage = ?, price = ? WHERE model_name = ?";
+    ;
+    public static final String UPDATE_WHEELS = "UPDATE table_wheels SET model_name = ?, pressure = ?, width = ?, mileage = ?, price = ? WHERE model_name = ?";
+    ;
     public static Statement statement;
     public static Connection connection;
 
@@ -51,7 +61,6 @@ public class MakeSql {
             preparedStatement.setString(5, wheels);
             preparedStatement.setInt(6, Integer.parseInt(id));
 
-            System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
             try {
                 preparedStatement.close();
@@ -110,6 +119,25 @@ public class MakeSql {
         }
     }
 
+    public String modelGetAll(String table_name) throws SQLException {
+        ResultSet resultSet = statement.executeQuery(SELECT_MODEL_QUERY + table_name);
+        String result = "";
+        while (resultSet.next()) {
+            result += resultSet.getString(1);
+            result += "; ";
+            result += String.valueOf(resultSet.getString(2));
+            result += "; ";
+            result += String.valueOf(resultSet.getString(3));
+            result += "; ";
+            result += String.valueOf(resultSet.getString(4));
+            result += "; ";
+            result += String.valueOf(resultSet.getString(5));
+            result += "; ";
+            result += "///";
+        }
+        return result;
+    }
+
     public String modelGetName(String table_name) throws SQLException {
         ResultSet resultSet = statement.executeQuery(SELECT_MODEL_QUERY + table_name);
         String result = "";
@@ -164,7 +192,7 @@ public class MakeSql {
             resultSet = statement.executeQuery(SELECT_MODEL_QUERY + table + condition + param);
         }
         String result = "";
-        if (table == "products"){
+        if (table == "products") {
             while (resultSet.next()) {
                 for (int i = 1; i <= 6; i++) {
                     result += resultSet.getString(i);
@@ -202,5 +230,82 @@ public class MakeSql {
         }
     }
 
+    public String editDetail(String model_name, Float par1, Float par2, int mileage, int price, int flag, String firstName) throws SQLException {
+        String query = null;
+        if (flag == 1) {
+            query = UPDATE_FUEL;
+        }
+        if (flag == 2) {
+            query = UPDATE_BATTERY;
+        }
+        if (flag == 3) {
+            query = UPDATE_CARCASE;
+        }
+        if (flag == 4) {
+            query = UPDATE_WHEELS;
+        }
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, model_name);
+            preparedStatement.setFloat(2, par1);
+            preparedStatement.setFloat(3, par2);
+            preparedStatement.setInt(4, mileage);
+            preparedStatement.setInt(5, price);
+            preparedStatement.setString(6, firstName);
+            try {
+                preparedStatement.executeUpdate();
+            } catch (SQLIntegrityConstraintViolationException e) {
+                return "bad";
+            }
+            try {
+                preparedStatement.close();
+                return "good";
+            } catch (SQLException e) {
+                return "bad";
+            }
+        }
+    }
 
+    public void insertDetail(String model_name, Float par1, Float par2, int mileage, int price, int flag) throws SQLException {
+        String query = null;
+        if (flag == 1) {
+            query = INSERT_FUEL;
+        }
+        if (flag == 2) {
+            query = INSERT_BATTERY;
+        }
+        if (flag == 3) {
+            query = INSERT_CARCASE;
+        }
+        if (flag == 4) {
+            query = INSERT_WHEELS;
+        }
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, model_name);
+            preparedStatement.setFloat(2, par1);
+            preparedStatement.setFloat(3, par2);
+            preparedStatement.setInt(4, mileage);
+            preparedStatement.setInt(5, price);
+            preparedStatement.executeUpdate();
+            try {
+                preparedStatement.close();
+            } catch (SQLException ignored) {
+            }
+        }
+    }
+
+    public String deleteDetail(String model_name, String table) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM " + table + " WHERE model_name = ?")) {
+            preparedStatement.setString(1, model_name);
+            System.out.println(preparedStatement);
+            preparedStatement.executeUpdate();
+            try {
+                preparedStatement.close();
+                return "good";
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            return "bad";
+        }
+    }
 }
