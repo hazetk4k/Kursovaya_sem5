@@ -229,9 +229,7 @@ class ClientHandler implements Runnable, Connected {
                                 System.out.println("Удаление выбранного продукта!");
                                 result = makeSql.getAllProducts();
                                 if (result.equals("")) {
-                                    out.println("Нет данных");
-                                } else {
-                                    out.println(result);
+                                    result = "Нет данных";
                                 }
                                 System.out.println("Данные по продуктам!");
                             }

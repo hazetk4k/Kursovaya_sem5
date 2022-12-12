@@ -125,13 +125,13 @@ public class MakeSql {
         while (resultSet.next()) {
             result += resultSet.getString(1);
             result += "; ";
-            result += String.valueOf(resultSet.getString(2));
+            result += String.valueOf(resultSet.getFloat(2));
             result += "; ";
-            result += String.valueOf(resultSet.getString(3));
+            result += String.valueOf(resultSet.getFloat(3));
             result += "; ";
-            result += String.valueOf(resultSet.getString(4));
+            result += String.valueOf(resultSet.getInt(4));
             result += "; ";
-            result += String.valueOf(resultSet.getString(5));
+            result += String.valueOf(resultSet.getInt(5));
             result += "; ";
             result += "///";
         }
